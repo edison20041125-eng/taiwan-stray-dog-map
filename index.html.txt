@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>台灣遊蕩犬分析</title>
+
+    <!-- Leaflet CSS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+
+    <style>
+        body {
+            font-family: "Noto Sans TC", sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            margin-bottom: 5px;
+        }
+        #map {
+            height: 520px;
+            width: 100%;
+            border: 1px solid #ccc;
+            margin-top: 10px;
+        }
+        .info {
+            margin-top: 15px;
+            padding: 12px;
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            border-radius: 6px;
+        }
+        .legend {
+            background: white;
+            padding: 8px 10px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .legend span {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            margin-right: 6px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>台灣遊蕩犬分析</h1>
+    <p>作者：石啟宏</p>
+
+    <div id="map">地圖載入中…</div>
+
+    <div class="info">
+        <strong>數據摘要：</strong><br>
+        113 年全國遊蕩犬估計總數為 <strong>141,584</strong> 隻。<br>
+        紅色圓點代表遊蕩犬數量高於 10,000 隻之縣市。
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        const map = L.map("map").setView([23.7, 121], 7);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            attribution: "&copy; OpenStreetMap contributors"
+        }).addTo(map);
+
+        const data = [
+            { name: "臺南市", count: 19990, lat: 22.99, lng: 120.21 },
+            { name: "嘉義縣", count: 16944, lat: 23.45, lng: 120.25 },
+            { name: "高雄市", count: 10200, lat: 22.62, lng: 120.31 },
+            { name: "屏東縣", count: 10024, lat: 22.67, lng: 120.48 },
+            { name: "新北市", count: 9982, lat: 25.01, lng: 121.46 },
+            { name: "南投縣", count: 9644, lat: 23.91, lng: 120.68 },
+            { name: "彰化縣", count: 9313, lat: 24.05, lng: 120.51 },
+            { name: "連江縣", count: 26, lat: 26.15, lng: 119.93 }
+        ];
+
+        data.forEach(d => {
+            const color = d.count > 10000 ? "red" : "orange";
+            const radius = Math.sqrt(d.count) / 8;
+
+            L.circleMarker([d.lat, d.lng], {
+                radius: radius,
+                color: color,
+                fillColor: color,
+                fillOpacity: 0.7
+            })
+            .addTo(map)
+            .bindPopup(`<strong>${d.name}</strong><br>遊蕩犬：約 ${d.count} 隻`);
+        });
+
+        // 圖例
+        const legend = L.control({ position: "bottomright" });
+        legend.onAdd = function () {
+            const div = L.DomUtil.create("div", "legend");
+            div.innerHTML = `
+                <strong>圖例</strong><br>
+                <span style="background:red"></span> &gt; 10,000 隻<br>
+                <span style="background:orange"></span> ≤ 10,000 隻
+            `;
+            return div;
+        };
+        legend.addTo(map);
+    </script>
+</body>
+</html>
